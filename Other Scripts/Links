@@ -1,0 +1,16 @@
+1. https://wiki.videolan.org/Transcode/#Compatibility_issues (Transcoding, its Methods, and Issues)
+2. https://wiki.videolan.org/Documentation:Streaming_HowTo/Receive_and_Save_a_Stream/#Save_a_stream_with_VLC (Documentation:Streaming HowTo/Receive and Save a Stream)
+3. http://www.videolan.org/developers/vlc/doc/doxygen/html/group__libvlc__media.html (Function Documentation)
+4. https://wiki.videolan.org/VLC_command-line_help (VLC command-line help)
+5. http://www.videolan.org/developers/vlc/doc/doxygen/html/group__libvlc__media.html (Again, Function Documentation)
+6. https://wiki.videolan.org/Documentation:Streaming_HowTo/Receive_and_Save_a_Stream#Save_a_stream_with_VLC (Documentation:Streaming HowTo/Receive and Save a Stream)
+7. https://stackoverflow.com/questions/16515099/saving-a-stream-while-playing-it-using-libvlc (Saving a stream while playing it using LibVLC)
+8. https://www.google.com/search?client=ubuntu&channel=fs&q=stream+output+to+a+file+vlc+api&ie=utf-8&oe=utf-8 (Google search of "stream output to a file vlc api")
+9. http://www.rukspot.com/aboutme.html (Example of C++ code for playing a an audio file using LibVLC)
+10. http://www.videolan.org/developers/vlc/doc/doxygen/html/group__sout__access.html#details (Access output * Output » Stream output)
+11. https://stackoverflow.com/questions/31790203/libvlc-error-cannot-create-muxer (Stack Overflow Question libVLC Error: cannot create muxer)
+12. http://www.videolan.org/vlc/streaming.html (Overview of the VideoLAN streaming solution)
+13. https://stackoverflow.com/questions/45173988/invalid-ue-golomb-code-rtsp (Stack Overflow Question Invalid UE golomb code RTSP)
+14. https://www.pythoncentral.io/pythons-time-sleep-pause-wait-sleep-stop-your-code/ (Python’s time.sleep() – Pause, Stop, Wait or Sleep your Python Code)
+15. 
+
