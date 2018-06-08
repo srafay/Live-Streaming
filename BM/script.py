@@ -3,16 +3,21 @@ import requests
 import json
 import random
 import threading
+import os
 
 adsCount = {}
 lastfilename = "" 
 
 def matchclip():
     filename = lastfilename
+    base = os.path.splitext(filename)[0]
+    os.rename(filename, base + ".mp3") 
+    filename = base + ".mp3" # kia kr rhy ho ? filename mein tou mp4 hi hy na hm ne direct ffmpeg se mp3 mei krtu li thi nahi horhi thi mujhe yaad hy ffmpeg se? han encoding ka issue tha hmm
+    print filename
     with open(filename, 'rb') as f:
         r = requests.post('http://ec2-18-217-247-101.us-east-2.compute.amazonaws.com/api/clip/match', files={'uploaded_file': f})
-        response = r.json()
-        print filename
+        print r.text
+        response = r.json() # ? filename ki logic check kro kahan ? masla ye tha k mp3 mein kar ray thy deocder ka masla tha, tou mp4 mein hi karlia tha, phir manually mp3 
         print response["found"]
         if response["found"] == "true":
             if response["song_name"] in adsCount:
@@ -20,19 +25,26 @@ def matchclip():
             else:
                 adsCount[response["song_name"]] = 1
 
-def parallelmatching():
-    matchclip()
-    threading.Timer(15.0, parallelmatching).start()
+# def parallelmatching():
+#     matchclip()
+#     threading.Timer(15.0, parallelmatching).start()
 
-# for i in range(1,4):
-delay = threading.Timer(15.0, parallelmatching)
-delay.start()
+# # for i in range(1,4):
+# delay = threading.Timer(15.0, parallelmatching)
+# delay.start()
 
 while(1):
     filename = "out{0}.mp4".format(random.randint(1,100))
     lastfilename = filename
     call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
+    thread = threading.Thread(target=matchclip)
+    thread.daemon = True
+    thread.start()
 
+#   bat suno hassan
+#   we could kill the thread once its job is finished. i think wo automatically hojayega ?
+# python manages that, sahi hy ?
+# ? hmm  sahi han one more thing I a m sending u a video wo dekho
 # print adsCount
 
 # import httplib, mimetypes
