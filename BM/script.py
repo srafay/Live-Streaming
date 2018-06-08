@@ -6,24 +6,29 @@ import threading
 import os
 
 adsCount = {}
-lastfilename = "" 
 
-def matchclip():
-    filename = lastfilename
+def matchclip(filename):
     base = os.path.splitext(filename)[0]
-    os.rename(filename, base + ".mp3") 
-    filename = base + ".mp3" # kia kr rhy ho ? filename mein tou mp4 hi hy na hm ne direct ffmpeg se mp3 mei krtu li thi nahi horhi thi mujhe yaad hy ffmpeg se? han encoding ka issue tha hmm
+    os.rename(filename, base + ".mp3")
+    filename = base + ".mp3",  # kia kr rhy ho ? filename mein tou mp4 hi hy na hm ne direct ffmpeg se mp3 mei krtu li thi nahi horhi thi mujhe yaad hy ffmpeg se? han encoding ka issue tha hmm
+    filename = ''.join(filename)
     print filename
     with open(filename, 'rb') as f:
         r = requests.post('http://ec2-18-217-247-101.us-east-2.compute.amazonaws.com/api/clip/match', files={'uploaded_file': f})
-        print r.text
-        response = r.json() # ? filename ki logic check kro kahan ? masla ye tha k mp3 mein kar ray thy deocder ka masla tha, tou mp4 mein hi karlia tha, phir manually mp3 
-        print response["found"]
-        if response["found"] == "true":
-            if response["song_name"] in adsCount:
-                adsCount[response["song_name"]] = adsCount[response["song_name"]] + 1
-            else:
-                adsCount[response["song_name"]] = 1
+        if r.status_code == 200:
+            print r.text
+            response = r.json() # ? filename ki logic check kro kahan ? masla ye tha k mp3 mein kar ray thy deocder ka masla tha, tou mp4 mein hi karlia tha, phir manually mp3 
+            print response["found"]
+            if response["found"] == "true":
+                if response["song_name"] in adsCount:
+                    adsCount[response["song_name"]] = adsCount[response["song_name"]] + 1
+                else:
+                    adsCount[response["song_name"]] = 1
+        else:            
+            print "Error in server response"
+            print r.status_code
+            print r.text
+    os.rename(filename,"clips/{0}".format(filename))
 
 # def parallelmatching():
 #     matchclip()
@@ -35,9 +40,8 @@ def matchclip():
 
 while(1):
     filename = "out{0}.mp4".format(random.randint(1,100))
-    lastfilename = filename
     call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
-    thread = threading.Thread(target=matchclip)
+    thread = threading.Thread(target=matchclip, args=(filename,))
     thread.daemon = True
     thread.start()
 
