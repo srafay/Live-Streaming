@@ -29,6 +29,7 @@ def matchclip(filename):
             print r.status_code
             print r.text
     os.rename(filename,"clips/{0}".format(filename))
+    print adsCount
 
 # def parallelmatching():
 #     matchclip()
