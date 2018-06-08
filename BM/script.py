@@ -1,15 +1,14 @@
 from subprocess import call
 import requests
 import json
+import random
+import threading
 
 adsCount = {}
+lastfilename = "" 
 
-# for i in range(1,4):
-#     filename = "out{0}.mp4".format(i)
-#     call(["ffmpeg", "-i", "http://app.pakistanvision.tv:1935/live/PTVnews/player.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
-
-for i in range(1,7):
-    filename = "out{0}.mp3".format(i)
+def matchclip():
+    filename = lastfilename
     with open(filename, 'rb') as f:
         r = requests.post('http://ec2-18-217-247-101.us-east-2.compute.amazonaws.com/api/clip/match', files={'uploaded_file': f})
         response = r.json()
@@ -21,7 +20,20 @@ for i in range(1,7):
             else:
                 adsCount[response["song_name"]] = 1
 
-print adsCount
+def parallelmatching():
+    matchclip()
+    threading.Timer(15.0, parallelmatching).start()
+
+# for i in range(1,4):
+delay = threading.Timer(15.0, parallelmatching)
+delay.start()
+
+while(1):
+    filename = "out{0}.mp4".format(random.randint(1,100))
+    lastfilename = filename
+    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
+
+# print adsCount
 
 # import httplib, mimetypes
 
