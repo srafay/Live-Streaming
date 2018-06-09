@@ -8,9 +8,9 @@ import os
 adsCount = {}
 
 def matchclip(filename):
-    base = os.path.splitext(filename)[0]
-    os.rename(filename, base + ".mp3")
-    filename = base + ".mp3",  # kia kr rhy ho ? filename mein tou mp4 hi hy na hm ne direct ffmpeg se mp3 mei krtu li thi nahi horhi thi mujhe yaad hy ffmpeg se? han encoding ka issue tha hmm
+    #base = os.path.splitext(filename)[0]
+    #os.rename(filename, base + ".mp3")
+    #filename = base + ".mp3"
     filename = ''.join(filename)
     print filename
     with open(filename, 'rb') as f:
@@ -29,7 +29,9 @@ def matchclip(filename):
             print r.status_code
             print r.text
     os.rename(filename,"clips/{0}".format(filename))
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     print adsCount
+    print "************************************"
 
 # def parallelmatching():
 #     matchclip()
@@ -40,8 +42,9 @@ def matchclip(filename):
 # delay.start()
 
 while(1):
-    filename = "out{0}.mp4".format(random.randint(1,100))
-    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
+    filename = "out{0}.m4a".format(random.randint(1,100))
+#    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
+    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename])
     thread = threading.Thread(target=matchclip, args=(filename,))
     thread.daemon = True
     thread.start()
