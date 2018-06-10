@@ -4,6 +4,7 @@ import json
 import random
 import threading
 import os
+import commands
 
 adsCount = {}
 
@@ -37,24 +38,25 @@ def matchclip(filename):
     print adsCount
     print "************************************"
 
-# def parallelmatching():
-#     matchclip()
-#     threading.Timer(15.0, parallelmatching).start()
+def getStreamURL(youtubeURL):
+    return commands.getstatusoutput('youtube-dl -f 92 -g {}' .format(youtubeURL))[1]
 
-# # for i in range(1,4):
-# delay = threading.Timer(15.0, parallelmatching)
-# delay.start()
-i = 0
+
+# MAIN PROGRAM STARTS HERE
+
+geoYoutubeStreamURL = "https://www.youtube.com/watch?v=x9isphj0Zc4"
+streamURL = getStreamURL(geoYoutubeStreamURL)
+clipNumber = 1
+
 while(1):
-    filename = "out{0}.m4a".format(i)
+    filename = "out{0}.m4a".format(clipNumber)
     #streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
-    streamURL = "https://manifest.googlevideo.com/api/manifest/hls_playlist/id/x9isphj0Zc4.1/itag/91/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/cmbypass/yes/goi/160/sgoap/gir%3Dyes%3Bitag%3D139/sgovp/gir%3Dyes%3Bitag%3D160/hls_chunk_host/r3---sn-jvooxjuoxu-3ipe.googlevideo.com/gcr/pk/ei/eWYcW-2IHor8owP2lLyIBQ/playlist_type/DVR/initcwndbps/1400/mm/32/mn/sn-jvooxjuoxu-3ipe/ms/lv/mv/m/pl/24/dover/10/manifest_duration/30/playlist_duration/30/keepalive/yes/mt/1528587800/disable_polymer/true/ip/111.88.59.195/ipbits/0/expire/1528609497/sparams/ip,ipbits,expire,id,itag,source,requiressl,ratebypass,live,cmbypass,goi,sgoap,sgovp,hls_chunk_host,gcr,ei,playlist_type,initcwndbps,mm,mn,ms,mv,pl/signature/475F62859E6A1D542ABDDD400ABE81B8F9F5C852.62E4C2A302D058A88743F8F6476F69A978C5DE6D/key/dg_yt0/playlist/index.m3u8"
 #    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
     call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename])
     thread = threading.Thread(target=matchclip, args=(filename,))
     thread.daemon = True
     thread.start()
-    i += 1
+    clipNumber += 1
 
 # ffmpeg -i http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8 -c copy -vn -ac 2 -acodec aac -strict -2 -format m4a -t 15 output.mp4
 # https://manifest.googlevideo.com/api/manifest/hls_playlist/id/x9isphj0Zc4.1/itag/91/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/cmbypass/yes/goi/160/sgoap/gir%3Dyes%3Bitag%3D139/sgovp/gir%3Dyes%3Bitag%3D160/hls_chunk_host/r3---sn-jvooxjuoxu-3ipe.googlevideo.com/gcr/pk/ei/eWYcW-2IHor8owP2lLyIBQ/playlist_type/DVR/initcwndbps/1400/mm/32/mn/sn-jvooxjuoxu-3ipe/ms/lv/mv/m/pl/24/dover/10/manifest_duration/30/playlist_duration/30/keepalive/yes/mt/1528587800/disable_polymer/true/ip/111.88.59.195/ipbits/0/expire/1528609497/sparams/ip,ipbits,expire,id,itag,source,requiressl,ratebypass,live,cmbypass,goi,sgoap,sgovp,hls_chunk_host,gcr,ei,playlist_type,initcwndbps,mm,mn,ms,mv,pl/signature/475F62859E6A1D542ABDDD400ABE81B8F9F5C852.62E4C2A302D058A88743F8F6476F69A978C5DE6D/key/dg_yt0/playlist/index.m3u8
