@@ -17,18 +17,22 @@ def matchclip(filename):
         r = requests.post('http://ec2-18-217-247-101.us-east-2.compute.amazonaws.com/api/clip/match', files={'uploaded_file': f})
         if r.status_code == 200:
             print r.text
-            response = r.json() # ? filename ki logic check kro kahan ? masla ye tha k mp3 mein kar ray thy deocder ka masla tha, tou mp4 mein hi karlia tha, phir manually mp3 
+            response = r.json()
             print response["found"]
             if response["found"] == "true":
                 if response["song_name"] in adsCount:
                     adsCount[response["song_name"]] = adsCount[response["song_name"]] + 1
                 else:
                     adsCount[response["song_name"]] = 1
-        else:            
+        else:
             print "Error in server response"
             print r.status_code
             print r.text
-    os.rename(filename,"clips/{0}".format(filename))
+    try:
+        os.rename(filename,"clips/{0}".format(filename))
+    except:
+        os.mkdir("clips")
+        os.rename(filename,"clips/{0}".format(filename))
     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     print adsCount
     print "************************************"
@@ -40,59 +44,17 @@ def matchclip(filename):
 # # for i in range(1,4):
 # delay = threading.Timer(15.0, parallelmatching)
 # delay.start()
-
+i = 0
 while(1):
-    filename = "out{0}.m4a".format(random.randint(1,100))
+    filename = "out{0}.m4a".format(i)
+    #streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
+    streamURL = "https://manifest.googlevideo.com/api/manifest/hls_playlist/id/x9isphj0Zc4.1/itag/91/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/cmbypass/yes/goi/160/sgoap/gir%3Dyes%3Bitag%3D139/sgovp/gir%3Dyes%3Bitag%3D160/hls_chunk_host/r3---sn-jvooxjuoxu-3ipe.googlevideo.com/gcr/pk/ei/eWYcW-2IHor8owP2lLyIBQ/playlist_type/DVR/initcwndbps/1400/mm/32/mn/sn-jvooxjuoxu-3ipe/ms/lv/mv/m/pl/24/dover/10/manifest_duration/30/playlist_duration/30/keepalive/yes/mt/1528587800/disable_polymer/true/ip/111.88.59.195/ipbits/0/expire/1528609497/sparams/ip,ipbits,expire,id,itag,source,requiressl,ratebypass,live,cmbypass,goi,sgoap,sgovp,hls_chunk_host,gcr,ei,playlist_type,initcwndbps,mm,mn,ms,mv,pl/signature/475F62859E6A1D542ABDDD400ABE81B8F9F5C852.62E4C2A302D058A88743F8F6476F69A978C5DE6D/key/dg_yt0/playlist/index.m3u8"
 #    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
-    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename])
+    call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename])
     thread = threading.Thread(target=matchclip, args=(filename,))
     thread.daemon = True
     thread.start()
+    i += 1
 
-#   bat suno hassan
-#   we could kill the thread once its job is finished. i think wo automatically hojayega ?
-# python manages that, sahi hy ?
-# ? hmm  sahi han one more thing I a m sending u a video wo dekho
-# print adsCount
-
-# import httplib, mimetypes
-
-# def post_multipart(host, uri, fields, files):
-#     content_type, body = encode_multipart_formdata(fields, files)
-#     h = httplib.HTTPConnection(host)
-#     headers = {
-#         'User-Agent': 'INSERT USERAGENTNAME',
-#         'Content-Type': content_type
-#         }
-#     h.request('POST', uri, body, headers)
-#     res = h.getresponse()
-#     return res.status, res.reason, res.read() 
-
-# def encode_multipart_formdata(fields, files):
-#     """
-#     fields is a sequence of (name, value) elements for regular form fields.
-#     files is a sequence of (name, filename, value) elements for data to be uploaded as files
-#     Return (content_type, body) ready for httplib.HTTP instance
-#     """
-#     BOUNDARY = '----------bound@ry_$'
-#     CRLF = '\r\n'
-#     L = []
-#     for (key, value) in fields:
-#         L.append('--' + BOUNDARY)
-#         L.append('Content-Disposition: form-data; name="%s"' % key)
-#         L.append('')
-#         L.append(value)
-#     for (key, filename, value) in files:
-#         L.append('--' + BOUNDARY)
-#         L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
-#         L.append('Content-Type: %s' % get_content_type(filename))
-#         L.append('')
-#         L.append(value)
-#     L.append('--' + BOUNDARY + '--')
-#     L.append('')
-#     body = CRLF.join(L)
-#     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
-#     return content_type, body
-
-# def get_content_type(filename):
-#     return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+# ffmpeg -i http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8 -c copy -vn -ac 2 -acodec aac -strict -2 -format m4a -t 15 output.mp4
+# https://manifest.googlevideo.com/api/manifest/hls_playlist/id/x9isphj0Zc4.1/itag/91/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/cmbypass/yes/goi/160/sgoap/gir%3Dyes%3Bitag%3D139/sgovp/gir%3Dyes%3Bitag%3D160/hls_chunk_host/r3---sn-jvooxjuoxu-3ipe.googlevideo.com/gcr/pk/ei/eWYcW-2IHor8owP2lLyIBQ/playlist_type/DVR/initcwndbps/1400/mm/32/mn/sn-jvooxjuoxu-3ipe/ms/lv/mv/m/pl/24/dover/10/manifest_duration/30/playlist_duration/30/keepalive/yes/mt/1528587800/disable_polymer/true/ip/111.88.59.195/ipbits/0/expire/1528609497/sparams/ip,ipbits,expire,id,itag,source,requiressl,ratebypass,live,cmbypass,goi,sgoap,sgovp,hls_chunk_host,gcr,ei,playlist_type,initcwndbps,mm,mn,ms,mv,pl/signature/475F62859E6A1D542ABDDD400ABE81B8F9F5C852.62E4C2A302D058A88743F8F6476F69A978C5DE6D/key/dg_yt0/playlist/index.m3u8
