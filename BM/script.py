@@ -1,4 +1,4 @@
-from subprocess import call
+#from subprocess import call
 import requests
 import json
 import random
@@ -7,35 +7,40 @@ import os
 import commands
 
 adsCount = {}
+clips = []
 
 def matchclip(filename):
-    #base = os.path.splitext(filename)[0]
-    #os.rename(filename, base + ".mp3")
-    #filename = base + ".mp3"
     filename = ''.join(filename)
-    print filename
     with open(filename, 'rb') as f:
-        r = requests.post('http://ec2-18-217-247-101.us-east-2.compute.amazonaws.com/api/clip/match', files={'uploaded_file': f})
-        if r.status_code == 200:
-            print r.text
-            response = r.json()
-            print response["found"]
-            if response["found"] == "true":
-                if response["song_name"] in adsCount:
-                    adsCount[response["song_name"]] = adsCount[response["song_name"]] + 1
-                else:
-                    adsCount[response["song_name"]] = 1
-        else:
-            print "Error in server response"
-            print r.status_code
-            print r.text
+        print (" Sending {} to the server" .format(filename))
+        try:
+            r = requests.post('http://lb-89089438.us-east-2.elb.amazonaws.com/api/clip/match', files={'uploaded_file': f})
+            if r.status_code == 200:
+                print (" {} received response from the server" .format(filename))
+                response = r.json()
+                print response["found"]
+                if response["found"] == "true":
+                    if response["song_name"] in adsCount:
+                        adsCount[response["song_name"]] = adsCount[response["song_name"]] + 1
+                    else:
+                        adsCount[response["song_name"]] = 1
+
+                    # For testing out
+                    clips.append("{}: {}" .format(response["song_name"], filename))
+            else:
+                print " Error in server response"
+                print r.status_code
+                print r.text
+        except:
+            print ("****************** There was an error getting response from the server ******************")
     try:
         os.rename(filename,"clips/{0}".format(filename))
     except:
         os.mkdir("clips")
         os.rename(filename,"clips/{0}".format(filename))
     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print adsCount
+    print ("Ads Count : {}" .format(adsCount))
+    print ("Clips: {}" .format(clips))
     print "************************************"
 
 def getStreamURL(youtubeURL):
@@ -45,14 +50,20 @@ def getStreamURL(youtubeURL):
 # MAIN PROGRAM STARTS HERE
 
 geoYoutubeStreamURL = "https://www.youtube.com/watch?v=x9isphj0Zc4"
-streamURL = getStreamURL(geoYoutubeStreamURL)
+print ("Getting stream URL!")
+#streamURL = getStreamURL(geoYoutubeStreamURL)
+streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
+print ("Stream URL updated succesfully!")
 clipNumber = 1
 
 while(1):
     filename = "out{0}.m4a".format(clipNumber)
-    #streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
-#    call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
-    call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename])
+#   streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
+#   call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
+    print ("\tRecording started {}" .format(filename))
+    os.system("ffmpeg -i {} -c copy -vn -ac 2 -acodec aac -strict -2 -format m4a -t 15 {} -loglevel quiet -b:a 320k" .format(streamURL, filename))
+#   call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename, "-loglevel", "quiet", "-b:a", "320k"])
+    print ("\tRecording complete {}" .format(filename))
     thread = threading.Thread(target=matchclip, args=(filename,))
     thread.daemon = True
     thread.start()
