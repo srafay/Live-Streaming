@@ -44,7 +44,7 @@ def matchclip(filename):
     print "************************************"
 
 def getStreamURL(youtubeURL):
-    return commands.getstatusoutput('youtube-dl -f 91 -g {}' .format(youtubeURL))[1]
+    return commands.getstatusoutput('youtube-dl -f 93 -g {}' .format(youtubeURL))[1]
 
 
 # MAIN PROGRAM STARTS HERE
@@ -61,7 +61,7 @@ while(1):
 #   streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
 #   call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
     print ("\tRecording started {}" .format(filename))
-    os.system("ffmpeg -i {} -c copy -vn -ac 2 -acodec aac -strict -2 -format m4a -t 5 {} -loglevel quiet -b:a 320k" .format(streamURL, filename))
+    os.system("ffmpeg -i {} -c copy -vn -ac 2 -acodec aac -strict -2 -format m4a -t 6 {} -loglevel quiet -b:a 320k" .format(streamURL, filename))
 #   call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename, "-loglevel", "quiet", "-b:a", "320k"])
     print ("\tRecording complete {}" .format(filename))
     thread = threading.Thread(target=matchclip, args=(filename,))
