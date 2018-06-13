@@ -57,11 +57,11 @@ print ("Stream URL updated succesfully!")
 clipNumber = 1
 
 while(1):
-    filename = "out{0}.m4a".format(clipNumber)
+    filename = "out{0}.opus".format(clipNumber)
 #   streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
 #   call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
     print ("\tRecording started {}" .format(filename))
-    os.system("ffmpeg -i {} -c copy -vn -ac 2 -acodec aac -strict -2 -format m4a -t 6 {} -loglevel quiet -b:a 320k" .format(streamURL, filename))
+    os.system("ffmpeg -i {} -c copy -vn -ac 2 -acodec libopus -vbr off -t 6 {} -b:a 64k -ar 44100 -loglevel error" .format(streamURL, filename))
 #   call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename, "-loglevel", "quiet", "-b:a", "320k"])
     print ("\tRecording complete {}" .format(filename))
     thread = threading.Thread(target=matchclip, args=(filename,))
