@@ -11,6 +11,7 @@ clips = []
 lastSongID = 0
 
 def matchclip(filename):
+    global lastSongID
     filename = ''.join(filename)
     with open(filename, 'rb') as f:
         print (" Sending {} to the server" .format(filename))
@@ -22,6 +23,7 @@ def matchclip(filename):
                 print response["found"]
                 if response["found"] == "true":
                     if response["song_id"] == lastSongID:
+                        print ("**{} detected again in {}, not counting this time**" .format(response["offertitle"], filename))
                         pass
                     else:
                         lastSongID = response["song_id"]
