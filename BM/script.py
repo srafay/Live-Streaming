@@ -8,6 +8,7 @@ import commands
 
 adsCount = {}
 clips = []
+lastSongID = 0
 
 def matchclip(filename):
     filename = ''.join(filename)
@@ -20,13 +21,20 @@ def matchclip(filename):
                 response = r.json()
                 print response["found"]
                 if response["found"] == "true":
-                    if response["song_name"] in adsCount:
-                        adsCount[response["song_name"]] = adsCount[response["song_name"]] + 1
+                    if response["song_id"] == lastSongID:
+                        pass
                     else:
-                        adsCount[response["song_name"]] = 1
+                        lastSongID = response["song_id"]
+                        if response["offertitle"] in adsCount:
+                            adsCount[response["offertitle"]] = adsCount[response["offertitle"]] + 1
+                        else:
+                            adsCount[response["offertitle"]] = 1
 
-                    # For testing out
-                    clips.append("{}: {}" .format(response["song_name"], filename))
+                        # For testing out
+                        clips.append("{}: {}" .format(response["offertitle"], filename))
+
+                else:
+                    lastSongID = 0
             else:
                 print " Error in server response"
                 print r.status_code
@@ -44,24 +52,24 @@ def matchclip(filename):
     print "************************************"
 
 def getStreamURL(youtubeURL):
-    return commands.getstatusoutput('youtube-dl -f 93 -g {}' .format(youtubeURL))[1]
+    return commands.getstatusoutput('youtube-dl -f 91 -g {}' .format(youtubeURL))[1]
 
 
 # MAIN PROGRAM STARTS HERE
 
 geoYoutubeStreamURL = "https://www.youtube.com/watch?v=FNkVeUGnkc4"
 print ("Getting stream URL!")
-streamURL = getStreamURL(geoYoutubeStreamURL)
-#streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
+#streamURL = getStreamURL(geoYoutubeStreamURL)
+streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
 print ("Stream URL updated succesfully!")
 clipNumber = 1
 
 while(1):
-    filename = "out{0}.opus".format(clipNumber)
+    filename = "out{0}.m4a".format(clipNumber)
 #   streamURL = "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8"
 #   call(["ffmpeg", "-i", "http://streamer64.eboundservices.com/geo/geonews_abr/playlist.m3u8", "-c", "copy", "-bsf:a", "aac_adtstoasc", "-vn", "-t", "15", filename])
     print ("\tRecording started {}" .format(filename))
-    os.system("ffmpeg -i {} -c copy -vn -ac 2 -acodec libopus -vbr off -t 6 {} -b:a 64k -ar 44100 -loglevel error" .format(streamURL, filename))
+    os.system("ffmpeg -i {} -vn -ac 1 -acodec aac -strict -2 -ar 44100 -b:a 256k -t 6 {} -loglevel error" .format(streamURL, filename))
 #   call(["ffmpeg", "-i", streamURL, "-c", "copy", "-vn", "-ac", "2", "-acodec", "aac", "-strict", "-2", "-format", "m4a", "-t", "15", filename, "-loglevel", "quiet", "-b:a", "320k"])
     print ("\tRecording complete {}" .format(filename))
     thread = threading.Thread(target=matchclip, args=(filename,))
