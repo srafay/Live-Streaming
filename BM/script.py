@@ -5,10 +5,24 @@ import random
 import threading
 import os
 import commands
+import MySQLdb
+from datetime import datetime
 
 adsCount = {}
 clips = []
 lastSongID = 0
+
+db = MySQLdb.connect("mediadb.cuhtvowyyedm.us-east-2.rds.amazonaws.com","mediadmin","media123","touchpoint")
+cursor = db.cursor()
+
+def writeToDB(response):
+    print(response)
+    livet = datetime.utcnow()
+    sql = "INSERT INTO bmstats(live_at, ad_id, ad_name, channel) VALUES({},{},{},{})".format(livet, response["song_id"],response["song_name"], "GEOTV")
+    cursor.execute(sql)
+    db.commit()
+    db.close()
+    print("Detected ad {} is written to db".format(response["song_name"]))
 
 def matchclip(filename):
     global lastSongID
@@ -26,6 +40,9 @@ def matchclip(filename):
                         print ("**{} detected again in {}, not counting this time**" .format(response["offertitle"], filename))
                         pass
                     else:
+                        thread = threading.Thread(target=writeToDB, args=(response,))
+                        thread.daemon = True
+                        thread.start()
                         lastSongID = response["song_id"]
                         if response["offertitle"] in adsCount:
                             adsCount[response["offertitle"]] = adsCount[response["offertitle"]] + 1
